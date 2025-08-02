@@ -3,46 +3,89 @@ import streamlit as st
 import requests
 import time
 
-# Set page title and layout
+# Set page config
 st.set_page_config(page_title="🎬 Suggesteria", page_icon="🎥", layout="wide")
 
-# Custom CSS for background, fonts, animation
+# Custom CSS: Gradient, Glass Effect, Animations
 st.markdown("""
     <style>
+    /* Background Gradient */
     body {
-        background-color: #f4f4f4;
-        color: #333333;
+        background: linear-gradient(135deg, #1f1c2c, #928DAB);
+        color: #FFFFFF;
         font-family: 'Helvetica Neue', sans-serif;
     }
+
     .main {
-        background-color: #f4f4f4;
-    }
-    header {
-        visibility: hidden;
-    }
-    footer {
-        visibility: hidden;
+        background: transparent;
     }
 
-    /* Fade-in animation */
+    header, footer {visibility: hidden;}
+
+    /* Poster Card */
+    .poster-container {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 10px;
+        transition: transform 0.3s ease;
+        animation: fadeIn 1s ease forwards;
+    }
+
+    .poster-container:hover {
+        transform: scale(1.05);
+    }
+
+    /* Poster Image */
     .poster-container img {
+        width: 100%;
+        border-radius: 12px;
         opacity: 0;
-        animation: fadeIn 1s ease-in forwards;
+        animation: fadeInPoster 1s ease-in forwards;
     }
 
+    /* Animations */
     @keyframes fadeIn {
-        to {
-            opacity: 1;
-        }
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    @keyframes fadeInPoster {
+        to {opacity: 1;}
+    }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 20px 0;
+        font-size: 14px;
+        color: #ff4b4b;
+        text-shadow: 0 0 10px #ff4b4b;
+    }
+
+    /* Buttons */
+    div.stButton > button {
+        border-radius: 30px;
+        background: linear-gradient(90deg, #ff512f, #dd2476);
+        color: white;
+        padding: 0.75em 2em;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    div.stButton > button:hover {
+        background: linear-gradient(90deg, #ff512f, #ff512f);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Beautiful header
+# Header
 st.markdown("""
     <div style='text-align: center; padding: 20px 0;'>
-        <h1 style='font-size: 48px; color: #ff4b4b;'>🎬 Suggesteria</h1>
-        <h3 style='color: #555555;'>Your Personalized Movie Recommender</h3>
+        <h1 style='font-size: 52px; color: #ff4b4b;'>🎬 Suggesteria</h1>
+        <h3 style='color: #DDDDDD;'>Your Personalized Movie Recommender</h3>
     </div>
 """, unsafe_allow_html=True)
 
@@ -54,7 +97,7 @@ except Exception as e:
     st.error(f"Error loading model files: {e}")
     st.stop()
 
-# Fetch poster using TMDb Search API (by title)
+# Fetch poster using TMDb Search API
 def fetch_poster(movie_title):
     api_key = "2e14804309c8641fbd7197e4fd53c2ef"
     url = f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={movie_title}"
@@ -95,11 +138,11 @@ def recommend(movie):
 
     return recommended_movie_names, recommended_movie_posters
 
-# Original UI preserved here
+# UI Logic
 movie_list = movies['title'].values
 selected_movie = st.selectbox("🎞️ Type or select a movie", movie_list)
 
-if st.button("🎥 Show Recommendations"):
+if st.button("✨ Show Recommendations"):
     names, posters = recommend(selected_movie)
     if names:
         cols = st.columns(5)
@@ -107,19 +150,20 @@ if st.button("🎥 Show Recommendations"):
             with cols[i]:
                 st.markdown(f"""
                     <div class="poster-container">
-                        <img src="{posters[i]}" style="width: 100%; border-radius: 10px;">
-                        <p style='text-align: center; margin-top: 8px; font-weight: bold;'>{names[i]}</p>
+                        <img src="{posters[i]}">
+                        <p style='text-align: center; margin-top: 8px; font-weight: bold; color: #FFFFFF;'>{names[i]}</p>
                     </div>
                 """, unsafe_allow_html=True)
     else:
         st.warning("No recommendations found.")
 
-# Footer with credit
-st.markdown("<hr>", unsafe_allow_html=True)
+# Footer with glow effect
 st.markdown("""
-    <div style='text-align: center; color: #888888; font-size: 14px; padding: 10px 0;'>
+    <hr>
+    <div class='footer'>
         Made with ❤️ by <strong>Pranjal Bopate</strong>
     </div>
 """, unsafe_allow_html=True)
+
 
 
