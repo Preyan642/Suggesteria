@@ -3,7 +3,24 @@ import streamlit as st
 import requests
 import time
 
-# Load model files
+# 🌐 Page config
+st.set_page_config(page_title="🎬 Suggesteria", page_icon="🎥", layout="wide")
+
+# 💄 Custom background color (light gray)
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #f7f9fc;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 🌟 App title and subtitle
+st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>🎬 Suggesteria</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: center; color: gray;'>Your Personalized Movie Recommender</h4>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
+
+# 📦 Load model files
 try:
     movies = pickle.load(open('model/movie_list.pkl', 'rb'))
     similarity = pickle.load(open('model/similarity.pkl', 'rb'))
@@ -11,7 +28,7 @@ except Exception as e:
     st.error(f"Error loading model files: {e}")
     st.stop()
 
-# Fetch poster using TMDb Search API (by title)
+# 🖼️ Fetch poster using TMDb Search API
 def fetch_poster(movie_title):
     api_key = "2e14804309c8641fbd7197e4fd53c2ef"
     url = f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={movie_title}"
@@ -32,7 +49,7 @@ def fetch_poster(movie_title):
 
     return "https://via.placeholder.com/500x750?text=No+Image"
 
-# Recommendation logic
+# 🧠 Recommendation logic
 def recommend(movie):
     try:
         index = movies[movies['title'] == movie].index[0]
@@ -50,24 +67,5 @@ def recommend(movie):
         recommended_movie_names.append(movie_title)
         recommended_movie_posters.append(fetch_poster(movie_title))
 
-    return recommended_movie_names, recommended_movie_posters
-
-# Streamlit UI setup
-st.set_page_config(page_title="Movie Recommender", layout="wide")
-st.header("🎬 Movie Recommender System")
-
-# Dropdown UI
-movie_list = movies['title'].values
-selected_movie = st.selectbox("Type or select a movie", movie_list)
-
-# Show recommendations
-if st.button("Show Recommendations"):
-    names, posters = recommend(selected_movie)
-    if names:
-        cols = st.columns(5)
-        for i in range(len(names)):
-            with cols[i]:
-                st.image(posters[i], caption=names[i], use_container_width=True)
-    else:
-        st.warning("No recommendations found.")
+    return reco
 
