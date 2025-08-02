@@ -3,24 +3,50 @@ import streamlit as st
 import requests
 import time
 
-# 🌐 Page config
+# Set page title and layout
 st.set_page_config(page_title="🎬 Suggesteria", page_icon="🎥", layout="wide")
 
-# 💄 Custom background color (light gray)
+# Custom CSS for background, fonts, animation
 st.markdown("""
     <style>
-    .stApp {
-        background-color: #f7f9fc;
+    body {
+        background-color: #f4f4f4;
+        color: #333333;
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+    .main {
+        background-color: #f4f4f4;
+    }
+    header {
+        visibility: hidden;
+    }
+    footer {
+        visibility: hidden;
+    }
+
+    /* Fade-in animation */
+    .poster-container img {
+        opacity: 0;
+        animation: fadeIn 1s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 🌟 App title and subtitle
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>🎬 Suggesteria</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align: center; color: gray;'>Your Personalized Movie Recommender</h4>", unsafe_allow_html=True)
-st.markdown("<br>", unsafe_allow_html=True)
+# Beautiful header
+st.markdown("""
+    <div style='text-align: center; padding: 20px 0;'>
+        <h1 style='font-size: 48px; color: #ff4b4b;'>🎬 Suggesteria</h1>
+        <h3 style='color: #555555;'>Your Personalized Movie Recommender</h3>
+    </div>
+""", unsafe_allow_html=True)
 
-# 📦 Load model files
+# Load model files
 try:
     movies = pickle.load(open('model/movie_list.pkl', 'rb'))
     similarity = pickle.load(open('model/similarity.pkl', 'rb'))
@@ -28,7 +54,7 @@ except Exception as e:
     st.error(f"Error loading model files: {e}")
     st.stop()
 
-# 🖼️ Fetch poster using TMDb Search API
+# Fetch poster using TMDb Search API (by title)
 def fetch_poster(movie_title):
     api_key = "2e14804309c8641fbd7197e4fd53c2ef"
     url = f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={movie_title}"
@@ -49,7 +75,7 @@ def fetch_poster(movie_title):
 
     return "https://via.placeholder.com/500x750?text=No+Image"
 
-# 🧠 Recommendation logic
+# Recommendation logic
 def recommend(movie):
     try:
         index = movies[movies['title'] == movie].index[0]
@@ -67,5 +93,33 @@ def recommend(movie):
         recommended_movie_names.append(movie_title)
         recommended_movie_posters.append(fetch_poster(movie_title))
 
-    return reco
+    return recommended_movie_names, recommended_movie_posters
+
+# Original UI preserved here
+movie_list = movies['title'].values
+selected_movie = st.selectbox("🎞️ Type or select a movie", movie_list)
+
+if st.button("🎥 Show Recommendations"):
+    names, posters = recommend(selected_movie)
+    if names:
+        cols = st.columns(5)
+        for i in range(len(names)):
+            with cols[i]:
+                st.markdown(f"""
+                    <div class="poster-container">
+                        <img src="{posters[i]}" style="width: 100%; border-radius: 10px;">
+                        <p style='text-align: center; margin-top: 8px; font-weight: bold;'>{names[i]}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+    else:
+        st.warning("No recommendations found.")
+
+# Footer with credit
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("""
+    <div style='text-align: center; color: #888888; font-size: 14px; padding: 10px 0;'>
+        Made with ❤️ by <strong>Pranjaal Bopate</strong>
+    </div>
+""", unsafe_allow_html=True)
+
 
