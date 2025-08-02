@@ -118,7 +118,7 @@ if st.button("🎥 Show Recommendations"):
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("""
     <div style='text-align: center; color: #888888; font-size: 14px; padding: 10px 0;'>
-        Made with ❤️ by <strong>Pranjaal Bopate</strong>
+        Made with ❤️ by <strong>Pranjal Bopate</strong>
     </div>
 """, unsafe_allow_html=True)
 
